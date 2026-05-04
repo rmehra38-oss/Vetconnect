@@ -31,12 +31,13 @@ export default function Consult() {
   // Selection State
   const [selectedPet, setSelectedPet] = useState<any>(null);
   const [customPet, setCustomPet] = useState(searchParams.get('pet') || '');
-  const [selectedService, setSelectedService] = useState<string | null>(null);
+  const [selectedService, setSelectedService] = useState<string | null>(searchParams.get('service') || null);
   const [symptoms, setSymptoms] = useState('');
   const [analysis, setAnalysis] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isBooking, setIsBooking] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(false);
 
   // New Pet Registration State
   const [showRegisterModal, setShowRegisterModal] = useState(false);
@@ -126,6 +127,30 @@ export default function Consult() {
   if (isSuccess) {
     return (
       <div className="bg-bg-cream min-h-screen pt-32 flex items-center justify-center px-6">
+        <AnimatePresence>
+          {isConnecting && (
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[100] bg-brand-green flex flex-col items-center justify-center text-white"
+            >
+              <div className="relative w-32 h-32 mb-8">
+                <motion.div 
+                  animate={{ scale: [1, 1.5, 1], opacity: [0.5, 0, 0.5] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                  className="absolute inset-0 bg-brand-gold rounded-full"
+                />
+                <div className="absolute inset-4 bg-white rounded-full flex items-center justify-center text-brand-green">
+                  <Video size={32} className="animate-pulse" />
+                </div>
+              </div>
+              <h3 className="text-2xl font-serif italic mb-2">Establishing Secure Link</h3>
+              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40">Encrypting P2P Channel...</p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         <motion.div 
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -149,9 +174,12 @@ export default function Consult() {
             </div>
             
             <button 
-              onClick={() => {
+              onClick={async () => {
+                setIsConnecting(true);
+                await new Promise(r => setTimeout(r, 2000));
                 const message = `Hi, I booked a ${currentService?.title} for ${petDisplayName}. My symptoms are: ${symptoms}`;
                 window.open(`${WHATSAPP_LINK}?text=${encodeURIComponent(message)}`, '_blank');
+                setIsConnecting(false);
               }}
               className="w-full py-4 bg-[#25D366] text-white rounded-2xl font-bold uppercase tracking-widest text-[10px] flex items-center justify-center gap-2 hover:scale-105 transition-transform"
             >

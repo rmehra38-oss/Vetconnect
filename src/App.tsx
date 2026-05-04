@@ -140,8 +140,8 @@ const Home = () => {
             >
               Instant veterinary support for your pets and livestock through 
               <a href={WHATSAPP_LINK} target="_blank" rel="noreferrer" className="text-brand-gold font-bold hover:underline mx-1">WhatsApp</a>, 
-              <Link to="/consult" className="text-brand-green font-bold hover:underline mx-1">audio</Link>, and 
-              <Link to="/consult" className="text-brand-green font-bold hover:underline mx-1">video</Link> consultations.
+              <Link to="/consult?service=audio" className="text-brand-green font-bold hover:underline mx-1">audio</Link>, and 
+              <Link to="/consult?service=video" className="text-brand-green font-bold hover:underline mx-1">video</Link> consultations.
             </motion.p>
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
@@ -149,7 +149,7 @@ const Home = () => {
               transition={{ delay: 0.2 }}
               className="flex flex-wrap gap-4 mt-6"
             >
-              <Link to="/consult" className="bg-brand-green text-white px-8 py-4 rounded-full font-bold text-sm uppercase tracking-widest flex items-center gap-3 hover:bg-brand-gold hover:text-brand-green transition-all shadow-xl shadow-brand-green/20">
+              <Link to="/consult?service=video" className="bg-brand-green text-white px-8 py-4 rounded-full font-bold text-sm uppercase tracking-widest flex items-center gap-3 hover:bg-brand-gold hover:text-brand-green transition-all shadow-xl shadow-brand-green/20">
                 <Video size={18} /> Start Video Call
               </Link>
               <a href={`${WHATSAPP_LINK}?text=${encodeURIComponent('Hi, I have a query regarding a veterinary consultation.')}`} target="_blank" rel="noreferrer" className="bg-white border border-brand-green/10 text-brand-green px-8 py-4 rounded-full font-bold text-sm uppercase tracking-widest flex items-center gap-3 hover:bg-brand-green hover:text-white transition-all shadow-sm">
@@ -192,22 +192,18 @@ const Home = () => {
                 </div>
 
                 <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4 bg-white/10 backdrop-blur-xl p-3 rounded-[2rem] border border-white/20">
-                   <a 
-                    href={`${WHATSAPP_LINK}?text=${encodeURIComponent('Hi, I want to start an audio consultation.')}`} 
-                    target="_blank" 
-                    rel="noreferrer"
-                    className="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center text-white cursor-pointer hover:bg-red-600 transition-colors"
-                   >
-                     <Phone size={18} />
-                   </a>
-                   <a 
-                    href={`${WHATSAPP_LINK}?text=${encodeURIComponent('Hi, I want to start a video consultation.')}`} 
-                    target="_blank" 
-                    rel="noreferrer"
-                    className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center text-white cursor-pointer hover:bg-white/40 transition-colors"
-                   >
-                     <Video size={18} />
-                   </a>
+                    <Link 
+                     to="/consult?service=audio"
+                     className="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center text-white cursor-pointer hover:bg-red-600 transition-colors"
+                    >
+                      <Phone size={18} />
+                    </Link>
+                    <Link 
+                     to="/consult?service=video"
+                     className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center text-white cursor-pointer hover:bg-white/40 transition-colors"
+                    >
+                      <Video size={18} />
+                    </Link>
                    <Link to="/consult" className="w-10 h-10 bg-brand-gold rounded-full flex items-center justify-center text-brand-green cursor-pointer hover:bg-white transition-all">
                      <MessageSquare size={18} />
                    </Link>
@@ -292,30 +288,31 @@ const Home = () => {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             {SERVICES_LIST.map((s, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.05 }}
-                className="bg-white rounded-[3rem] border border-brand-green/5 shadow-sm hover:shadow-xl hover:border-brand-green/10 transition-all group overflow-hidden flex flex-col"
-              >
-                <div className="relative h-48 w-full overflow-hidden">
-                  <img 
-                    src={s.image} 
-                    alt={s.title} 
-                    referrerPolicy="no-referrer"
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
-                  />
-                  <div className="absolute top-4 left-4 w-12 h-12 bg-white/90 backdrop-blur-md rounded-2xl flex items-center justify-center text-brand-green shadow-lg">
-                    <s.icon size={24} />
+              <Link to="/consult" key={i}>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.05 }}
+                  className="bg-white rounded-[3rem] border border-brand-green/5 shadow-sm hover:shadow-xl hover:border-brand-green/10 transition-all group overflow-hidden flex flex-col h-full"
+                >
+                  <div className="relative h-48 w-full overflow-hidden">
+                    <img 
+                      src={s.image} 
+                      alt={s.title} 
+                      referrerPolicy="no-referrer"
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
+                    />
+                    <div className="absolute top-4 left-4 w-12 h-12 bg-white/90 backdrop-blur-md rounded-2xl flex items-center justify-center text-brand-green shadow-lg">
+                      <s.icon size={24} />
+                    </div>
                   </div>
-                </div>
-                <div className="p-8 lg:p-10 flex-1 flex flex-col">
-                  <h4 className="text-2xl font-serif italic text-brand-green mb-4 leading-tight">{s.title}</h4>
-                  <p className="text-brand-green/60 text-xs leading-relaxed font-medium">{s.desc}</p>
-                </div>
-              </motion.div>
+                  <div className="p-8 lg:p-10 flex-1 flex flex-col">
+                    <h4 className="text-2xl font-serif italic text-brand-green mb-4 leading-tight">{s.title}</h4>
+                    <p className="text-brand-green/60 text-xs leading-relaxed font-medium">{s.desc}</p>
+                  </div>
+                </motion.div>
+              </Link>
             ))}
           </div>
         </section>
@@ -396,7 +393,7 @@ function Navbar({ user, loading }: { user: any, loading: boolean }) {
               Login
             </button>
           )}
-          <Link to="/consult" className="px-6 py-2 bg-brand-gold text-white rounded-full text-[10px] font-bold uppercase tracking-widest hover:bg-opacity-90 transition-all shadow-lg shadow-brand-gold/20">
+          <Link to="/consult?service=emergency" className="px-6 py-2 bg-brand-gold text-white rounded-full text-[10px] font-bold uppercase tracking-widest hover:bg-opacity-90 transition-all shadow-lg shadow-brand-gold/20">
             Emergency 24/7
           </Link>
         </div>
@@ -464,10 +461,10 @@ function Footer() {
         </div>
 
         <div className="flex-1 flex justify-end">
-          <div className="text-right">
-            <p className="text-white text-4xl font-serif italic leading-none mb-1">10 Min</p>
+          <Link to="/consult?service=emergency" className="text-right cursor-pointer group hover:scale-105 transition-transform">
+            <p className="text-white text-4xl font-serif italic leading-none mb-1 group-hover:text-brand-gold transition-colors">10 Min</p>
             <p className="text-[10px] uppercase font-bold tracking-[0.4em] text-brand-gold">Emergency Response</p>
-          </div>
+          </Link>
         </div>
       </div>
       <div className="max-w-7xl mx-auto border-t border-white/10 mt-16 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] uppercase font-bold tracking-widest">
@@ -506,6 +503,7 @@ export default function App() {
             <Route path="/consult" element={<Consult />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/about" element={<About />} />
+            <Route path="*" element={<Home />} />
           </Routes>
         </main>
         <Footer />
