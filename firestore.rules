@@ -29,9 +29,18 @@ service cloud.firestore {
 
     // User Rules
     match /users/{userId} {
-      allow get: if isOwner(userId) || (isSignedIn() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin');
-      allow create: if isOwner(userId) && incoming().role == 'user' && incoming().createdAt == request.time;
-      allow update: if isOwner(userId) && incoming().role == existing().role && incoming().createdAt == existing().createdAt;
+      allow get: if isSignedIn();
+      allow list: if isSignedIn() && (resource.data.role == 'doctor' || isOwner(userId) || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin');
+      
+      allow create: if isOwner(userId) && 
+                      incoming().role in ['user', 'doctor'] && 
+                      incoming().isVerified == false &&
+                      incoming().createdAt == request.time;
+                      
+      allow update: if isOwner(userId) && 
+                      incoming().role == existing().role && 
+                      incoming().createdAt == existing().createdAt &&
+                      (incoming().isVerified == existing().isVerified || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin');
     }
 
     // Pet Rules

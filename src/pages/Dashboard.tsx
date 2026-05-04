@@ -4,12 +4,13 @@ import { motion } from 'motion/react';
 import { 
   User, LayoutDashboard, Calendar, History, ShoppingBag, 
   Settings, Plus, ChevronRight, Activity, ShieldCheck, 
-  Dog, Cat, Bird, Info, LogOut
+  Dog, Cat, Bird, Info, LogOut, Stethoscope
 } from 'lucide-react';
 import { auth, db } from '../lib/firebase';
 import { WHATSAPP_LINK } from '../constants';
 import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { handleFirestoreError, OperationType } from '../lib/firestore-errors';
 
 export default function Dashboard() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -25,15 +26,27 @@ export default function Dashboard() {
     const fetchData = async () => {
       if (!auth.currentUser) return;
       
-      const userRef = doc(db, 'users', auth.currentUser.uid);
-      const userSnap = await getDoc(userRef);
-      if (userSnap.exists()) setUserProfile(userSnap.data());
+      try {
+        const userRef = doc(db, 'users', auth.currentUser.uid);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists()) setUserProfile(userSnap.data());
+      } catch (err) {
+        handleFirestoreError(err, OperationType.GET, `users/${auth.currentUser.uid}`);
+      }
 
-      const petsSnap = await getDocs(query(collection(db, 'pets'), where('ownerId', '==', auth.currentUser.uid)));
-      setPets(petsSnap.docs.map(d => ({ id: d.id, ...d.data() })));
+      try {
+        const petsSnap = await getDocs(query(collection(db, 'pets'), where('ownerId', '==', auth.currentUser.uid)));
+        setPets(petsSnap.docs.map(d => ({ id: d.id, ...d.data() })));
+      } catch (err) {
+        handleFirestoreError(err, OperationType.LIST, 'pets');
+      }
 
-      const consultsSnap = await getDocs(query(collection(db, 'consultations'), where('userId', '==', auth.currentUser.uid)));
-      setConsults(consultsSnap.docs.map(d => ({ id: d.id, ...d.data() })));
+      try {
+        const consultsSnap = await getDocs(query(collection(db, 'consultations'), where('userId', '==', auth.currentUser.uid)));
+        setConsults(consultsSnap.docs.map(d => ({ id: d.id, ...d.data() })));
+      } catch (err) {
+        handleFirestoreError(err, OperationType.LIST, 'consultations');
+      }
 
       setLoading(false);
     };
@@ -87,6 +100,15 @@ export default function Dashboard() {
         <div className="flex flex-col lg:flex-row gap-12">
           {/* Sidebar */}
           <aside className="w-full lg:w-72 space-y-3">
+            {userProfile?.role === 'doctor' && (
+              <Link 
+                to="/vet-portal"
+                className="w-full mb-6 flex items-center gap-4 px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest bg-brand-gold text-brand-green shadow-xl shadow-brand-gold/20 hover:scale-105 transition-all"
+              >
+                <Stethoscope size={20} />
+                Doctor Portal
+              </Link>
+            )}
             {sidebarItems.map(item => (
               <button 
                 key={item.id}

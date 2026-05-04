@@ -11,6 +11,7 @@ import { auth, db } from '../lib/firebase';
 import { collection, query, where, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
 import { WHATSAPP_LINK } from '../constants';
 import Markdown from 'react-markdown';
+import { handleFirestoreError, OperationType } from '../lib/firestore-errors';
 
 const SERVICES = [
   { id: 'whatsapp', icon: MessageSquare, title: "WhatsApp Chat", price: "₹99", color: "bg-green-50 text-green-600", desc: "Text, photo & video messages via WhatsApp Business API" },
@@ -70,7 +71,7 @@ export default function Consult() {
         if (found) setSelectedPet(found);
       }
     } catch (error) {
-      console.error("Error fetching pets:", error);
+      handleFirestoreError(error, OperationType.LIST, 'pets');
     } finally {
       setLoadingPets(false);
     }
@@ -98,7 +99,7 @@ export default function Consult() {
       setShowRegisterModal(false);
       setNewPet({ name: '', species: 'Dog', breed: '', age: '' });
     } catch (error) {
-      console.error("Error adding pet:", error);
+      handleFirestoreError(error, OperationType.CREATE, 'pets');
     } finally {
       setIsRegistering(false);
     }

@@ -2,14 +2,30 @@
   "entities": {
     "User": {
       "title": "User",
-      "description": "User profile information",
+      "description": "User profile information for pet owners and doctors",
       "type": "object",
       "properties": {
         "email": { "type": "string" },
         "name": { "type": "string" },
+        "fullName": { "type": "string" },
         "role": { "type": "string", "enum": ["user", "doctor", "admin"] },
         "phone": { "type": "string" },
-        "createdAt": { "type": "string", "format": "date-time" }
+        "mobile": { "type": "string" },
+        "qualification": { "type": "string" },
+        "experience": { "type": "string" },
+        "specialization": { "type": "string" },
+        "languages": { "type": "array", "items": { "type": "string" } },
+        "charges": { "type": "string" },
+        "timings": { "type": "string" },
+        "whatsappNumber": { "type": "string" },
+        "videoEnabled": { "type": "boolean" },
+        "audioEnabled": { "type": "boolean" },
+        "degreeUploaded": { "type": "boolean" },
+        "photoUploaded": { "type": "boolean" },
+        "registrationStep": { "type": "string", "enum": ["pending", "completed"] },
+        "isVerified": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
       },
       "required": ["email", "role", "createdAt"]
     },

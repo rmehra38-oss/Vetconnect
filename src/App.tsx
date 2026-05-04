@@ -19,6 +19,7 @@ import Shop from './pages/Shop';
 import Consult from './pages/Consult';
 import Dashboard from './pages/Dashboard';
 import About from './pages/About';
+import VetPortal from './pages/VetPortal';
 
 import { WHATSAPP_LINK } from './constants';
 
@@ -322,7 +323,7 @@ const Home = () => {
 };
 
 // Components
-function Navbar({ user, loading }: { user: any, loading: boolean }) {
+function Navbar({ user, userProfile, loading }: { user: any, userProfile: any, loading: boolean }) {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
@@ -377,6 +378,12 @@ function Navbar({ user, loading }: { user: any, loading: boolean }) {
             <div className="w-8 h-8 rounded-full bg-slate-200 animate-pulse" />
           ) : user ? (
             <div className="flex items-center gap-2">
+              {/* If doctor role is present in session, show Vet Portal link */}
+              {userProfile?.role === 'doctor' && (
+                <Link to="/vet-portal" className="hidden xl:flex px-6 py-2 rounded-full border border-brand-gold text-brand-gold text-[10px] font-bold uppercase tracking-widest hover:bg-brand-gold hover:text-white transition-all">
+                  Doctor Portal
+                </Link>
+              )}
               <Link to="/dashboard" className="px-6 py-2 rounded-full border border-brand-green text-[10px] font-bold uppercase tracking-widest hover:bg-brand-green hover:text-white transition-all">
                 Dashboard
               </Link>
@@ -418,7 +425,12 @@ function Navbar({ user, loading }: { user: any, loading: boolean }) {
               <Link to="/about" onClick={() => setIsOpen(false)}>Farmer Hub</Link>
               <div className="h-[1px] bg-slate-100" />
               {user ? (
-                <Link to="/dashboard" onClick={() => setIsOpen(false)} className="text-brand-gold">Dashboard</Link>
+                <>
+                  {userProfile?.role === 'doctor' && (
+                    <Link to="/vet-portal" onClick={() => setIsOpen(false)} className="text-brand-gold">Doctor Portal</Link>
+                  )}
+                  <Link to="/dashboard" onClick={() => setIsOpen(false)} className="text-brand-gold">Dashboard</Link>
+                </>
               ) : (
                 <button onClick={() => { loginWithGoogle(); setIsOpen(false); }} className="text-left text-brand-gold">Login</button>
               )}
@@ -436,7 +448,7 @@ function Footer() {
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-12 lg:gap-20">
         <div className="flex-1 flex flex-col gap-4">
           <span className="text-[10px] uppercase font-bold tracking-[0.2em] text-brand-gold">Live Doctors Online</span>
-          <div className="flex -space-x-3">
+          <div className="flex -space-x-3 mb-2">
             {[1, 2, 3].map(i => (
               <div key={i} className="w-12 h-12 rounded-full border-4 border-brand-green bg-slate-600 overflow-hidden">
                 <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${i+20}`} alt="doctor" />
@@ -444,6 +456,9 @@ function Footer() {
             ))}
             <div className="w-12 h-12 rounded-full border-4 border-brand-green bg-brand-gold flex items-center justify-center text-brand-green text-xs font-black">+14</div>
           </div>
+          <Link to="/vet-portal" className="text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-brand-gold transition-colors flex items-center gap-2">
+            Join as a Veterinarian <ChevronRight size={12} />
+          </Link>
         </div>
 
         <div className="hidden lg:block h-20 w-[1px] bg-white/10" />
@@ -481,11 +496,23 @@ function Footer() {
 
 export default function App() {
   const [user, setUser] = useState<any>(null);
+  const [userProfile, setUserProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (u) => {
+    const unsubscribe = onAuthStateChanged(auth, async (u) => {
       setUser(u);
+      if (u) {
+        const userRef = doc(db, 'users', u.uid);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists()) {
+          setUserProfile(userSnap.data());
+        } else {
+          setUserProfile(null);
+        }
+      } else {
+        setUserProfile(null);
+      }
       setLoading(false);
     });
     return () => unsubscribe();
@@ -495,7 +522,7 @@ export default function App() {
     <BrowserRouter>
       <ScrollToTop />
       <div className="min-h-screen flex flex-col pt-0">
-        <Navbar user={user} loading={loading} />
+        <Navbar user={user} userProfile={userProfile} loading={loading} />
         <main className="flex-grow">
           <Routes>
             <Route path="/" element={<Home />} />
@@ -503,6 +530,7 @@ export default function App() {
             <Route path="/consult" element={<Consult />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/about" element={<About />} />
+            <Route path="/vet-portal" element={<VetPortal />} />
             <Route path="*" element={<Home />} />
           </Routes>
         </main>
