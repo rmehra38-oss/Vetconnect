@@ -87,13 +87,16 @@ export default function Consult() {
     
     setIsRegistering(true);
     try {
-      const docRef = await addDoc(collection(db, 'pets'), {
+      const petPayload = {
         ...newPet,
+        age: newPet.age ? Number(newPet.age) : 0,
         ownerId: auth.currentUser.uid,
         createdAt: serverTimestamp()
-      });
+      };
+
+      const docRef = await addDoc(collection(db, 'pets'), petPayload);
       
-      const createdPet = { id: docRef.id, ...newPet };
+      const createdPet = { id: docRef.id, ...petPayload };
       setPets(prev => [createdPet, ...prev]);
       setSelectedPet(createdPet);
       setShowRegisterModal(false);
@@ -101,7 +104,8 @@ export default function Consult() {
     } catch (error) {
       handleFirestoreError(error, OperationType.CREATE, 'pets');
     } finally {
-      setIsRegistering(false);
+      setIsRegistering(true); // Small delay for UX transition
+      setTimeout(() => setIsRegistering(false), 500);
     }
   };
 
@@ -328,7 +332,8 @@ export default function Consult() {
                                <option>Dog</option>
                                <option>Cat</option>
                                <option>Bird</option>
-                               <option>Cattle</option>
+                               <option>Cattle / Cow</option>
+                               <option>Buffalo</option>
                                <option>Horse</option>
                                <option>Other</option>
                              </select>

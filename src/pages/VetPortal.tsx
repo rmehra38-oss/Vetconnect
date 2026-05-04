@@ -90,7 +90,15 @@ export default function VetPortal() {
 
   const loginWithSocial = async (providerName: 'google' | 'whatsapp') => {
     if (providerName === 'whatsapp') {
-       alert("Redirecting to WhatsApp for secure authentication...");
+       // Simulate WhatsApp auth for UI demo
+       alert("WhatsApp Authentication Successful (Mocked)");
+       // In a real app, this would use a custom token or OTP
+       // For now just simulate a state where we might be a doctor
+       if (auth.currentUser) {
+         const userRef = doc(db, 'users', auth.currentUser.uid);
+         const userSnap = await getDoc(userRef);
+         if (userSnap.exists()) setUserProfile(userSnap.data());
+       }
        return;
     }
     try {
@@ -106,25 +114,26 @@ export default function VetPortal() {
       }
 
       if (userSnap && !userSnap.exists()) {
-        try {
-          await setDoc(userRef, {
-            email: result.user.email,
-            name: result.user.displayName,
-            role: 'doctor',
-            isVerified: false,
-            registrationStep: 'pending',
-            createdAt: serverTimestamp()
-          });
-        } catch (err) {
-          handleFirestoreError(err, OperationType.WRITE, `users/${result.user.uid}`);
-        }
-        setUserProfile({
+        const newProfile = {
           email: result.user.email,
           name: result.user.displayName,
           role: 'doctor',
           isVerified: false,
-          registrationStep: 'pending'
+          registrationStep: 'pending',
+          createdAt: serverTimestamp()
+        };
+        try {
+          await setDoc(userRef, newProfile);
+        } catch (err) {
+          handleFirestoreError(err, OperationType.WRITE, `users/${result.user.uid}`);
+        }
+        setUserProfile({
+          ...newProfile,
+          createdAt: new Date().toISOString() // approximation for state
         });
+      } else if (userSnap) {
+        // Handle existing users immediately
+        setUserProfile(userSnap.data());
       }
     } catch (err: any) {
       console.error(err);

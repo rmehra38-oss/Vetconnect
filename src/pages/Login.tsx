@@ -17,6 +17,8 @@ export default function Login() {
       const result = await signInWithPopup(auth, provider);
       
       const userRef = doc(db, 'users', result.user.uid);
+      let targetPath = from;
+      
       try {
         const userSnap = await getDoc(userRef);
         if (!userSnap.exists()) {
@@ -26,20 +28,27 @@ export default function Login() {
             role: 'user',
             createdAt: serverTimestamp()
           });
+        } else {
+          // If already a doctor, redirect to portal
+          const userData = userSnap.data();
+          if (userData.role === 'doctor') {
+            targetPath = '/vet-portal';
+          }
         }
       } catch (err) {
         handleFirestoreError(err, OperationType.GET, `users/${result.user.uid}`);
       }
       
-      navigate(from, { replace: true });
+      navigate(targetPath, { replace: true });
     } catch (error) {
       console.error("Login failed:", error);
     }
   };
 
   const loginWithWhatsApp = () => {
-    // In a real app, this would trigger an OTP flow via WhatsApp API
-    alert("Redirecting to WhatsApp for secure passwordless authentication...");
+    // Simulating a successful WhatsApp OTP / Auth flow for demo
+    alert("WhatsApp Authentication Successful (Mocked)");
+    navigate(from, { replace: true });
   };
 
   return (
