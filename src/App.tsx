@@ -20,6 +20,7 @@ import Consult from './pages/Consult';
 import Dashboard from './pages/Dashboard';
 import About from './pages/About';
 import VetPortal from './pages/VetPortal';
+import Login from './pages/Login';
 
 import { WHATSAPP_LINK } from './constants';
 
@@ -327,6 +328,7 @@ function Navbar({ user, userProfile, loading }: { user: any, userProfile: any, l
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -336,24 +338,8 @@ function Navbar({ user, userProfile, loading }: { user: any, userProfile: any, l
 
   const isActive = (path: string) => location.pathname === path;
 
-  const loginWithGoogle = async () => {
-    try {
-      const provider = new GoogleAuthProvider();
-      const result = await signInWithPopup(auth, provider);
-      const userRef = doc(db, 'users', result.user.uid);
-      const userSnap = await getDoc(userRef);
-      
-      if (!userSnap.exists()) {
-        await setDoc(userRef, {
-          email: result.user.email,
-          name: result.user.displayName,
-          role: 'user',
-          createdAt: new Date().toISOString()
-        });
-      }
-    } catch (e) {
-      console.error(e);
-    }
+  const loginWithGoogle = () => {
+    navigate('/login');
   };
 
   return (
@@ -531,6 +517,7 @@ export default function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/about" element={<About />} />
             <Route path="/vet-portal" element={<VetPortal />} />
+            <Route path="/login" element={<Login />} />
             <Route path="*" element={<Home />} />
           </Routes>
         </main>
