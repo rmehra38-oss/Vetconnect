@@ -1,0 +1,14 @@
+{
+  "name": "VetConnect",
+  "description": "A comprehensive digital platform for pet owners and farmers to connect with licensed veterinarians for consultations and shop for pet and farm healthcare products.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ],
+  "majorCapabilities": [
+    "Video Consultation",
+    "E-commerce Store",
+    "Health Records Management",
+    "Emergency Support"
+  ]
+}

@@ -1,0 +1,62 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // User Rules
+    match /users/{userId} {
+      allow get: if isOwner(userId) || (isSignedIn() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin');
+      allow create: if isOwner(userId) && incoming().role == 'user' && incoming().createdAt == request.time;
+      allow update: if isOwner(userId) && incoming().role == existing().role && incoming().createdAt == existing().createdAt;
+    }
+
+    // Pet Rules
+    match /pets/{petId} {
+      allow read: if isSignedIn() && (isOwner(existing().ownerId) || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['doctor', 'admin']);
+      allow create: if isSignedIn() && isOwner(incoming().ownerId) && incoming().createdAt == request.time;
+      allow update: if isSignedIn() && isOwner(existing().ownerId) && incoming().ownerId == existing().ownerId;
+      allow delete: if isSignedIn() && isOwner(existing().ownerId);
+    }
+
+    // Product Rules (Public Read)
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if isSignedIn() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // Consultation Rules
+    match /consultations/{consultationId} {
+      allow read: if isSignedIn() && (isOwner(existing().userId) || isOwner(existing().doctorId) || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin');
+      allow create: if isSignedIn() && isOwner(incoming().userId) && incoming().status == 'pending' && incoming().createdAt == request.time;
+      allow update: if isSignedIn() && (
+        (isOwner(existing().userId) && incoming().diff(existing()).affectedKeys().hasOnly(['symptoms', 'status']) && existing().status == 'pending') ||
+        (isOwner(existing().doctorId) && incoming().diff(existing()).affectedKeys().hasOnly(['status', 'prescription', 'updatedAt']) && incoming().updatedAt == request.time) ||
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin')
+      );
+    }
+  }
+}

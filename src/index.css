@@ -1,0 +1,22 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Playfair+Display:ital,wght@0,700;1,700&family=DM+Serif+Display:ital@0;1&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "DM Serif Display", serif;
+  --font-body: "Inter", sans-serif;
+
+  --color-brand-green: #1B4332;
+  --color-brand-gold: #FFB703;
+  --color-bg-cream: #FDFCF8;
+  --color-bg-sand: #F4F1EA;
+}
+
+body {
+  font-family: var(--font-body);
+  @apply bg-bg-cream text-brand-green;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-serif);
+}
