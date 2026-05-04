@@ -42,6 +42,7 @@ export default function VetPortal() {
     email: '',
     qualification: 'BVSc',
     experience: '',
+    registrationNumber: '',
     specialization: 'Pet Specialist (Dogs/Cats)',
     languages: [] as string[],
     charges: '',
@@ -298,16 +299,16 @@ export default function VetPortal() {
                animate={{ opacity: 1, x: 0 }}
                className="text-6xl font-serif italic mb-10 leading-[1.1]"
              >
-                Empowering <br /> 
-                <span className="text-brand-gold italic">Elite Veterinarians</span> <br /> 
+                Join India's <br /> 
+                <span className="text-brand-gold italic">Trusted Vet Network</span> <br /> 
                 Across Borders.
              </motion.h2>
 
              <div className="space-y-8 max-w-md">
                 {[
-                  { title: "Pan-India Reach", desc: "Connect with farmers and pet owners from rural districts to metro cities.", icon: Globe },
-                  { title: "Flexible Telemedicine", desc: "Consult via Video, Audio or WhatsApp on your schedule.", icon: Smartphone },
-                  { title: "Assured Earnings", desc: "Secure monthly pay-outs with transparent consultation statistics.", icon: IndianRupee }
+                  { title: "Consult Pet Owners & Farmers Online", desc: "Connect with rural dairy farmers and urban pet owners via our high-speed telemedicine link.", icon: Users },
+                  { title: "Earn via WhatsApp & Video", desc: "Monetize your expertise through Video, Audio, or WhatsApp consultations on your own terms.", icon: Smartphone },
+                  { title: "Assured Digital Earnings", desc: "Secure monthly pay-outs with transparent dashboard tracking of all your clinical statistics.", icon: IndianRupee }
                 ].map((item, i) => (
                   <motion.div 
                     key={i}
@@ -361,20 +362,20 @@ export default function VetPortal() {
                >
                  <div className="mb-12">
                    <h2 className="text-5xl lg:text-7xl font-serif italic text-brand-green transition-all leading-tight">
-                      {authMode === 'login' ? 'Welcome Back, Doc' : 'Join the Elite Network'}
+                      {authMode === 'login' ? 'Doctor Login' : 'Register Practice'}
                    </h2>
-                   <p className="text-[10px] font-black uppercase tracking-[0.5em] text-brand-green/30 mt-4 px-4">
-                      Veterinary Telemedicine Platform
+                   <p className="text-[10px] font-black uppercase tracking-[0.5em] text-brand-green/30 mt-4">
+                      Premium Healthcare SaaS Interface
                    </p>
                  </div>
 
                  <div className="space-y-6">
                     <button 
                       onClick={() => loginWithSocial('google')}
-                      className="w-full bg-white border border-brand-green/10 text-brand-green py-5 rounded-[2rem] font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-4 hover:shadow-2xl transition-all group shadow-sm"
+                      className="w-full bg-white border-2 border-brand-green/10 text-brand-green py-6 rounded-[2.5rem] font-black uppercase tracking-widest text-[11px] flex items-center justify-center gap-4 hover:border-brand-green transition-all group shadow-sm hover:shadow-xl"
                     >
                       <img src="https://www.google.com/favicon.ico" alt="Google" className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                      Continue with Professional ID (Google)
+                      Continue with Google (Gmail)
                     </button>
                     <button 
                       onClick={() => loginWithSocial('whatsapp')}
@@ -452,16 +453,63 @@ export default function VetPortal() {
 
                  <form onSubmit={handleRegister} className="space-y-8">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                       <div className="md:col-span-2">
-                          <label className="text-[10px] font-black uppercase tracking-widest text-brand-green/40 block mb-3 px-4">Medical Full Name (Verified)</label>
+                       <div className="md:col-span-1">
+                          <label className="text-[10px] font-black uppercase tracking-widest text-brand-green/40 block mb-3 px-4 flex justify-between">
+                             <span>Full Name (Verified)</span>
+                             <span className="text-green-600 flex items-center gap-1"><CheckCircle2 size={10} /> Sync from Google</span>
+                          </label>
                           <div className="relative">
                              <User size={18} className="absolute left-6 top-1/2 -translate-y-1/2 text-brand-green/10" />
                              <input 
-                               required
+                               readOnly
                                type="text" 
                                value={formData.fullName}
-                               onChange={e => setFormData({...formData, fullName: e.target.value})}
-                               placeholder="Dr. Sanjay Kumar"
+                               className="w-full bg-green-50/50 border-2 border-green-100 rounded-[1.5rem] pl-16 pr-6 py-5 text-brand-green/60 font-medium outline-none cursor-not-allowed"
+                             />
+                          </div>
+                       </div>
+
+                       <div className="md:col-span-1">
+                          <label className="text-[10px] font-black uppercase tracking-widest text-brand-green/40 block mb-3 px-4 flex justify-between">
+                             <span>Gmail Address</span>
+                             <span className="text-green-600 flex items-center gap-1"><CheckCircle2 size={10} /> Verified</span>
+                          </label>
+                          <div className="relative">
+                             <Mail size={18} className="absolute left-6 top-1/2 -translate-y-1/2 text-brand-green/10" />
+                             <input 
+                               readOnly
+                               type="text" 
+                               value={formData.email}
+                               className="w-full bg-green-50/50 border-2 border-green-100 rounded-[1.5rem] pl-16 pr-6 py-5 text-brand-green/60 font-medium outline-none cursor-not-allowed"
+                             />
+                          </div>
+                       </div>
+
+                       <div>
+                          <label className="text-[10px] font-black uppercase tracking-widest text-brand-green/40 block mb-3 px-4">Mobile Number</label>
+                          <div className="relative">
+                             <Phone size={18} className="absolute left-6 top-1/2 -translate-y-1/2 text-brand-green/10" />
+                             <input 
+                               required
+                               type="tel" 
+                               value={formData.mobile}
+                               onChange={e => setFormData({...formData, mobile: e.target.value})}
+                               placeholder="+91 99999 99999"
+                               className="w-full bg-bg-sand border-none rounded-[1.5rem] pl-16 pr-6 py-5 text-brand-green focus:ring-2 focus:ring-brand-gold outline-none"
+                             />
+                          </div>
+                       </div>
+
+                       <div>
+                          <label className="text-[10px] font-black uppercase tracking-widest text-brand-green/40 block mb-3 px-4">WhatsApp Number</label>
+                          <div className="relative">
+                             <MessageSquare size={18} className="absolute left-6 top-1/2 -translate-y-1/2 text-brand-green/10" />
+                             <input 
+                               required
+                               type="tel" 
+                               value={formData.whatsappNumber}
+                               onChange={e => setFormData({...formData, whatsappNumber: e.target.value})}
+                               placeholder="+91 99999 99999"
                                className="w-full bg-bg-sand border-none rounded-[1.5rem] pl-16 pr-6 py-5 text-brand-green focus:ring-2 focus:ring-brand-gold outline-none"
                              />
                           </div>
@@ -491,7 +539,7 @@ export default function VetPortal() {
                        </div>
 
                        <div className="md:col-span-2">
-                          <label className="text-[10px] font-black uppercase tracking-widest text-brand-green/40 block mb-3 px-4">Core Specialization</label>
+                          <label className="text-[10px] font-black uppercase tracking-widest text-brand-green/40 block mb-3 px-4">Area of Expertise / Specialty</label>
                           <select 
                              value={formData.specialization}
                              onChange={e => setFormData({...formData, specialization: e.target.value})}
@@ -499,6 +547,46 @@ export default function VetPortal() {
                           >
                              {SPECIALIZATIONS.map(s => <option key={s}>{s}</option>)}
                           </select>
+                       </div>
+
+                       <div className="md:col-span-2">
+                          <label className="text-[10px] font-black uppercase tracking-widest text-brand-green/40 block mb-3 px-4">Languages Spoken</label>
+                          <div className="flex flex-wrap gap-2 px-2">
+                             {LANGUAGES.map(lang => (
+                               <button
+                                 key={lang}
+                                 type="button"
+                                 onClick={() => {
+                                   const next = formData.languages.includes(lang)
+                                     ? formData.languages.filter(l => l !== lang)
+                                     : [...formData.languages, lang];
+                                   setFormData({...formData, languages: next});
+                                 }}
+                                 className={`px-6 py-2 rounded-full text-[10px] font-bold uppercase transition-all ${
+                                   formData.languages.includes(lang)
+                                     ? 'bg-brand-gold text-brand-green shadow-md'
+                                     : 'bg-bg-sand text-brand-green/30 hover:bg-white hover:text-brand-green shadow-sm'
+                                 }`}
+                               >
+                                 {lang}
+                               </button>
+                             ))}
+                          </div>
+                       </div>
+
+                       <div className="md:col-span-2">
+                          <label className="text-[10px] font-black uppercase tracking-widest text-brand-green/40 block mb-3 px-4">Medical Registration Number (VCI/State)</label>
+                          <div className="relative">
+                             <ShieldCheck size={18} className="absolute left-6 top-1/2 -translate-y-1/2 text-brand-green/10" />
+                             <input 
+                               required
+                               type="text" 
+                               value={formData.registrationNumber || ''}
+                               onChange={e => setFormData({...formData, registrationNumber: e.target.value})}
+                               placeholder="e.g. VCI-12345"
+                               className="w-full bg-bg-sand border-none rounded-[1.5rem] pl-16 pr-6 py-5 text-brand-green focus:ring-2 focus:ring-brand-gold outline-none"
+                             />
+                          </div>
                        </div>
 
                        <div className="md:col-span-2">
