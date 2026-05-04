@@ -7,7 +7,8 @@ import { BrowserRouter, Routes, Route, Link, useNavigate, useLocation } from 're
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Menu, X, MessageSquare, Phone, Video, AlertCircle, ShoppingBag, 
-  User, LayoutDashboard, LogOut, ChevronRight, Github, Twitter, Instagram 
+  User, LayoutDashboard, LogOut, ChevronRight, Github, Twitter, Instagram,
+  Soup, ShieldCheck, FileText, Zap, Scissors, Bird, Brain, Scale, Milk, Activity
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { auth, db } from './lib/firebase';
@@ -29,6 +30,69 @@ const ScrollToTop = () => {
   }, [pathname]);
   return null;
 };
+
+const SERVICES_LIST = [
+  {
+    title: "Nutrition & Diet Planning",
+    desc: "Personalized diet plans for dogs, cats, cows, buffaloes, poultry, goats, and other animals based on age, breed, and health condition.",
+    icon: Soup,
+    image: "https://images.unsplash.com/photo-1589923188900-85dae523342b?auto=format&fit=crop&q=80&w=800"
+  },
+  {
+    title: "Vaccination Services",
+    desc: "Vaccination schedules, reminders, and preventive healthcare guidance.",
+    icon: ShieldCheck,
+    image: "https://images.unsplash.com/photo-1628154791552-28af1f0bc94e?auto=format&fit=crop&q=80&w=800"
+  },
+  {
+    title: "Pet Pharmacy & Store",
+    desc: "Online shopping for pet food, supplements, medicines, grooming products, and farm healthcare supplies.",
+    icon: ShoppingBag,
+    image: "https://images.unsplash.com/photo-1625316708582-7c3873423af9?auto=format&fit=crop&q=80&w=800"
+  },
+  {
+    title: "Online Prescription Services",
+    desc: "Digital prescriptions and medicine recommendations from certified veterinary doctors.",
+    icon: FileText,
+    image: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=80&w=800"
+  },
+  {
+    title: "Skin & Allergy Treatment",
+    desc: "Treatment support for itching, hair fall, infections, ticks, allergies, and skin diseases.",
+    icon: Zap,
+    image: "https://images.unsplash.com/photo-1599443015574-be5fe8a05783?auto=format&fit=crop&q=80&w=800"
+  },
+  {
+    title: "Pet Grooming Guidance",
+    desc: "Professional advice for grooming, hygiene, coat care, and bathing routines.",
+    icon: Scissors,
+    image: "https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?auto=format&fit=crop&q=80&w=800"
+  },
+  {
+    title: "Dairy Farm Health Management",
+    desc: "Expert consultation for milk production, buffalo health, cow nutrition, mastitis prevention, and dairy productivity improvement.",
+    icon: Milk,
+    image: "https://images.unsplash.com/photo-1500595046743-cd271d694d30?auto=format&fit=crop&q=80&w=800"
+  },
+  {
+    title: "Poultry Farm Consultation",
+    desc: "Disease prevention, vaccination, feed management, and productivity optimization for poultry farms.",
+    icon: Bird,
+    image: "https://images.unsplash.com/photo-1514327605112-b887c0e61c0a?auto=format&fit=crop&q=80&w=800"
+  },
+  {
+    title: "Pet Behavioral Consultation",
+    desc: "Advice for aggression, anxiety, barking, eating disorders, stress, and training behavior.",
+    icon: Brain,
+    image: "https://images.unsplash.com/photo-1544568100-847a948585b9?auto=format&fit=crop&q=80&w=800"
+  },
+  {
+    title: "Weight Management Programs",
+    desc: "Specialized weight gain and weight loss diet programs for pets and livestock.",
+    icon: Scale,
+    image: "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&q=80&w=800"
+  }
+];
 
 const Home = () => {
   return (
@@ -217,6 +281,43 @@ const Home = () => {
               <p className="text-3xl font-serif italic text-brand-green">{s.val}</p>
             </div>
           ))}
+        </section>
+
+        {/* Service Area */}
+        <section className="mt-32">
+          <div className="text-center mb-16">
+            <h2 className="text-[10px] font-black uppercase tracking-[0.5em] text-brand-green/30 mb-4">Our Service Area</h2>
+            <h3 className="text-4xl lg:text-6xl font-serif italic text-brand-green">Comprehensive Animal Healthcare</h3>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            {SERVICES_LIST.map((s, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.05 }}
+                className="bg-white rounded-[3rem] border border-brand-green/5 shadow-sm hover:shadow-xl hover:border-brand-green/10 transition-all group overflow-hidden flex flex-col"
+              >
+                <div className="relative h-48 w-full overflow-hidden">
+                  <img 
+                    src={s.image} 
+                    alt={s.title} 
+                    referrerPolicy="no-referrer"
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
+                  />
+                  <div className="absolute top-4 left-4 w-12 h-12 bg-white/90 backdrop-blur-md rounded-2xl flex items-center justify-center text-brand-green shadow-lg">
+                    <s.icon size={24} />
+                  </div>
+                </div>
+                <div className="p-8 lg:p-10 flex-1 flex flex-col">
+                  <h4 className="text-2xl font-serif italic text-brand-green mb-4 leading-tight">{s.title}</h4>
+                  <p className="text-brand-green/60 text-xs leading-relaxed font-medium">{s.desc}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </section>
       </div>
     </div>
