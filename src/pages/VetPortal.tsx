@@ -371,56 +371,25 @@ export default function VetPortal() {
 
                  <div className="space-y-6">
                     <button 
-                      onClick={() => loginWithSocial('google')}
-                      className="w-full bg-white border-2 border-brand-green/10 text-brand-green py-6 rounded-[2.5rem] font-black uppercase tracking-widest text-[11px] flex items-center justify-center gap-4 hover:border-brand-green transition-all group shadow-sm hover:shadow-xl"
+                       onClick={() => loginWithSocial('google')}
+                       className="w-full bg-white border-2 border-brand-green/10 text-brand-green py-6 rounded-[2.5rem] font-black uppercase tracking-widest text-[11px] flex items-center justify-center gap-4 hover:border-brand-green transition-all group shadow-sm hover:shadow-xl"
                     >
                       <img src="https://www.google.com/favicon.ico" alt="Google" className="w-5 h-5 group-hover:scale-110 transition-transform" />
                       Continue with Google (Gmail)
                     </button>
                     <button 
                       onClick={() => loginWithSocial('whatsapp')}
-                      className="w-full bg-[#E7F7EF] text-[#128C7E] py-5 rounded-[2rem] font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-4 hover:shadow-2xl transition-all group shadow-sm"
+                      className="w-full bg-[#E7F7EF] text-[#128C7E] py-6 rounded-[2.5rem] font-black uppercase tracking-widest text-[11px] flex items-center justify-center gap-4 hover:shadow-2xl transition-all group shadow-sm"
                     >
                       <MessageSquare size={18} className="group-hover:scale-110 transition-transform" />
                       Authenticate via WhatsApp Secure
                     </button>
 
-                    <div className="relative py-8">
-                       <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-brand-green/10"></div></div>
-                       <div className="relative flex justify-center text-[10px] font-black uppercase tracking-widest"><span className="bg-bg-cream px-8 text-brand-green/20">Authorized Access Only</span></div>
-                    </div>
-
-                    <div className="bg-white p-12 rounded-[4rem] border border-brand-green/5 shadow-2xl space-y-6">
-                       <div className="space-y-4">
-                          <div className="relative">
-                             <Lock size={16} className="absolute left-6 top-1/2 -translate-y-1/2 text-brand-green/20" />
-                             <input 
-                               type="email" 
-                               placeholder="Medical Email / Mobile"
-                               className="w-full bg-bg-sand border-none rounded-2xl pl-16 pr-6 py-5 text-brand-green placeholder:text-brand-green/20 focus:ring-2 focus:ring-brand-gold outline-none font-medium"
-                             />
-                          </div>
-                          <div className="relative">
-                             <Lock size={16} className="absolute left-6 top-1/2 -translate-y-1/2 text-brand-green/20" />
-                             <input 
-                               type="password" 
-                               placeholder="Secure Credentials"
-                               className="w-full bg-bg-sand border-none rounded-2xl pl-16 pr-6 py-5 text-brand-green placeholder:text-brand-green/20 focus:ring-2 focus:ring-brand-gold outline-none font-medium"
-                             />
-                          </div>
+                    <div className="pt-8 text-center">
+                       <div className="flex items-center justify-center gap-2 text-[9px] font-black uppercase tracking-[0.2em] text-brand-green/20">
+                          <ShieldCheck size={12} />
+                          <span>Secure Passwordless Medical Access</span>
                        </div>
-                       
-                       <div className="flex justify-between items-center px-4">
-                          <label className="flex items-center gap-3 cursor-pointer">
-                             <input type="checkbox" className="w-4 h-4 rounded border-brand-green/10 text-brand-green focus:ring-brand-green" />
-                             <span className="text-[10px] font-black uppercase tracking-widest text-brand-green/40">Remember Portal</span>
-                          </label>
-                          <button className="text-[10px] font-black uppercase tracking-widest text-brand-gold hover:underline">Forgot Credentials?</button>
-                       </div>
-
-                       <button className="w-full py-6 bg-brand-green text-white font-black uppercase tracking-[0.3em] text-[10px] rounded-full hover:bg-brand-gold hover:text-brand-green transition-all shadow-xl shadow-brand-green/20">
-                          Secure Login
-                       </button>
                     </div>
 
                     <p className="mt-10 text-brand-green text-[10px] font-bold uppercase tracking-widest opacity-40">
