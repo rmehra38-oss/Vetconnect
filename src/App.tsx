@@ -17,6 +17,7 @@ import { doc, getDoc, setDoc } from 'firebase/firestore';
 
 import Shop from './pages/Shop';
 import Consult from './pages/Consult';
+import Vets from './pages/Vets';
 import Dashboard from './pages/Dashboard';
 import About from './pages/About';
 import VetPortal from './pages/VetPortal';
@@ -24,7 +25,10 @@ import Login from './pages/Login';
 
 import { WHATSAPP_LINK } from './constants';
 
+
 // Pages
+import { requestNotificationPermission, sendNotification } from './services/notificationService';
+
 const ScrollToTop = () => {
   const { pathname } = useLocation();
   useEffect(() => {
@@ -152,11 +156,14 @@ const Home = () => {
               className="flex flex-wrap gap-4 mt-6"
             >
               <Link to="/consult?service=video" className="bg-brand-green text-white px-8 py-4 rounded-full font-bold text-sm uppercase tracking-widest flex items-center gap-3 hover:bg-brand-gold hover:text-brand-green transition-all shadow-xl shadow-brand-green/20">
-                <Video size={18} /> Start Video Call
+                <Video size={18} /> Book Consultation
               </Link>
-              <a href={`${WHATSAPP_LINK}?text=${encodeURIComponent('Hi, I have a query regarding a veterinary consultation.')}`} target="_blank" rel="noreferrer" className="bg-white border border-brand-green/10 text-brand-green px-8 py-4 rounded-full font-bold text-sm uppercase tracking-widest flex items-center gap-3 hover:bg-brand-green hover:text-white transition-all shadow-sm">
-                <MessageSquare size={18} /> WhatsApp
-              </a>
+              <Link to="/consult?service=audio" className="bg-white border border-brand-green/10 text-brand-green px-8 py-4 rounded-full font-bold text-sm uppercase tracking-widest flex items-center gap-3 hover:bg-brand-green hover:text-white transition-all shadow-sm">
+                <Phone size={18} /> Audio Consultation
+              </Link>
+              <Link to="/consult?service=whatsapp" className="bg-white border border-brand-green/10 text-brand-green px-8 py-4 rounded-full font-bold text-sm uppercase tracking-widest flex items-center gap-3 hover:bg-brand-green hover:text-white transition-all shadow-sm">
+                <MessageSquare size={18} /> WhatsApp Chat
+              </Link>
             </motion.div>
             
             <div className="mt-8 flex items-center gap-4 text-xs font-bold uppercase tracking-widest opacity-40">
@@ -289,29 +296,27 @@ const Home = () => {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            {SERVICES_LIST.map((s, i) => (
-              <Link to="/consult" key={i}>
+            {[
+              { id: 'video', title: "Video Consultation", desc: "Face-to-face clinical checkups from home.", icon: Video, color: "bg-purple-50 text-purple-600" },
+              { id: 'audio', title: "Audio Consultation", desc: "Expert voice consultations for quick queries.", icon: Phone, color: "bg-blue-50 text-blue-600" },
+              { id: 'whatsapp', title: "WhatsApp Support", desc: "Send photos & get text advice instantly.", icon: MessageSquare, color: "bg-green-50 text-green-600" },
+              { id: 'emergency', title: "Emergency Care", desc: "Priority 24/7 access for critical cases.", icon: AlertCircle, color: "bg-red-50 text-red-600" },
+            ].map((s, i) => (
+              <Link to={`/consult?service=${s.id}`} key={i}>
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.05 }}
-                  className="bg-white rounded-[3rem] border border-brand-green/5 shadow-sm hover:shadow-xl hover:border-brand-green/10 transition-all group overflow-hidden flex flex-col h-full"
+                  className="bg-white rounded-[3rem] border border-brand-green/5 shadow-sm hover:shadow-xl hover:border-brand-green/10 transition-all group overflow-hidden flex flex-col h-full p-8 lg:p-10"
                 >
-                  <div className="relative h-48 w-full overflow-hidden">
-                    <img 
-                      src={s.image} 
-                      alt={s.title} 
-                      referrerPolicy="no-referrer"
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
-                    />
-                    <div className="absolute top-4 left-4 w-12 h-12 bg-white/90 backdrop-blur-md rounded-2xl flex items-center justify-center text-brand-green shadow-lg">
-                      <s.icon size={24} />
-                    </div>
+                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-6 ${s.color}`}>
+                    <s.icon size={24} />
                   </div>
-                  <div className="p-8 lg:p-10 flex-1 flex flex-col">
-                    <h4 className="text-2xl font-serif italic text-brand-green mb-4 leading-tight">{s.title}</h4>
-                    <p className="text-brand-green/60 text-xs leading-relaxed font-medium">{s.desc}</p>
+                  <h4 className="text-2xl font-serif italic text-brand-green mb-4 leading-tight">{s.title}</h4>
+                  <p className="text-brand-green/60 text-xs leading-relaxed font-medium mb-8">{s.desc}</p>
+                  <div className="mt-auto flex items-center gap-2 text-brand-gold font-bold text-[10px] uppercase tracking-widest group-hover:translate-x-2 transition-transform">
+                    Book Now <ChevronRight size={12} />
                   </div>
                 </motion.div>
               </Link>
@@ -354,6 +359,7 @@ function Navbar({ user, userProfile, loading }: { user: any, userProfile: any, l
 
         {/* Desktop Nav */}
         <div className="hidden lg:flex items-center gap-10 text-xs font-bold uppercase tracking-[0.2em]">
+          <Link to="/vets" className={`${isActive('/vets') ? 'text-brand-gold' : 'text-brand-green/70'} hover:text-brand-gold transition-colors`}>Our Experts</Link>
           <Link to="/consult" className={`${isActive('/consult') ? 'text-brand-gold' : 'text-brand-green/70'} hover:text-brand-gold transition-colors`}>Consultation</Link>
           <Link to="/shop" className={`${isActive('/shop') ? 'text-brand-gold' : 'text-brand-green/70'} hover:text-brand-gold transition-colors`}>Product Store</Link>
           <Link to="/about" className={`${isActive('/about') ? 'text-brand-gold' : 'text-brand-green/70'} hover:text-brand-gold transition-colors`}>Farmer Hub</Link>
@@ -406,6 +412,7 @@ function Navbar({ user, userProfile, loading }: { user: any, userProfile: any, l
             className="absolute top-full left-0 right-0 bg-white border-t border-slate-100 p-8 shadow-2xl lg:hidden"
           >
             <div className="flex flex-col gap-6 text-brand-green font-bold uppercase tracking-widest text-sm">
+              <Link to="/vets" onClick={() => setIsOpen(false)}>Our Experts</Link>
               <Link to="/consult" onClick={() => setIsOpen(false)}>Consultation</Link>
               <Link to="/shop" onClick={() => setIsOpen(false)}>Product Store</Link>
               <Link to="/about" onClick={() => setIsOpen(false)}>Farmer Hub</Link>
@@ -489,6 +496,7 @@ export default function App() {
     const unsubscribe = onAuthStateChanged(auth, async (u) => {
       setUser(u);
       if (u) {
+        requestNotificationPermission();
         const userRef = doc(db, 'users', u.uid);
         const userSnap = await getDoc(userRef);
         if (userSnap.exists()) {
@@ -512,6 +520,7 @@ export default function App() {
         <main className="flex-grow">
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/vets" element={<Vets />} />
             <Route path="/shop" element={<Shop />} />
             <Route path="/consult" element={<Consult />} />
             <Route path="/dashboard" element={<Dashboard />} />

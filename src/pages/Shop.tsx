@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { ShoppingBag, Search, Filter, ChevronRight, Star } from 'lucide-react';
+import { ShoppingBag, Search, Filter, ChevronRight, Star, CreditCard } from 'lucide-react';
+import { openRazorpay } from '../lib/razorpay';
+import { auth } from '../lib/firebase';
 
 const PRODUCTS = [
   { id: 1, name: "Premium Dog Food", price: 1200, category: "pet", sub: "Food", img: "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&q=80&w=400", rating: 4.8 },
@@ -21,6 +23,21 @@ export default function Shop() {
   const handleAddToCart = (id: number) => {
     setAddedId(id);
     setTimeout(() => setAddedId(null), 2000);
+  };
+
+  const handleBuyNow = (product: typeof PRODUCTS[0]) => {
+    openRazorpay({
+      amount: product.price * 100,
+      name: 'Vet Connect Shop',
+      description: `Purchase: ${product.name}`,
+      prefill: {
+        name: auth.currentUser?.displayName || '',
+        email: auth.currentUser?.email || '',
+      },
+      handler: (response: any) => {
+        alert('Purchase Successful! Order ID: ' + response.razorpay_payment_id);
+      }
+    });
   };
 
   const filteredProducts = PRODUCTS.filter(p => {
@@ -109,23 +126,33 @@ export default function Shop() {
               
               <h3 className="text-xl font-serif italic text-brand-green mb-6 group-hover:translate-x-2 transition-transform">{product.name}</h3>
               
-              <div className="flex items-center justify-between mt-auto">
+              <div className="flex items-center justify-between mt-auto gap-4">
                 <div className="flex flex-col">
                   <span className="text-2xl font-serif italic text-brand-green">₹{product.price}</span>
                   <span className="text-[10px] text-brand-green/30 font-bold uppercase tracking-widest">Net Price</span>
                 </div>
-                <button 
-                  onClick={() => handleAddToCart(product.id)}
-                  className={`p-4 rounded-2xl transition-all shadow-xl active:scale-90 flex items-center gap-2 ${
-                    addedId === product.id ? 'bg-brand-gold text-brand-green' : 'bg-brand-green text-white shadow-brand-green/10 hover:bg-brand-gold hover:text-brand-green'
-                  }`}
-                >
-                  {addedId === product.id ? (
-                    <span className="text-[10px] font-black uppercase tracking-widest px-2">Added</span>
-                  ) : (
-                    <ShoppingBag size={24} />
-                  )}
-                </button>
+                <div className="flex gap-2">
+                  <button 
+                    onClick={() => handleAddToCart(product.id)}
+                    className={`p-4 rounded-xl transition-all shadow-md active:scale-90 flex items-center justify-center ${
+                      addedId === product.id ? 'bg-brand-gold text-brand-green' : 'bg-bg-sand text-brand-green hover:bg-brand-green/5'
+                    }`}
+                    title="Add to Cart"
+                  >
+                    {addedId === product.id ? (
+                      <span className="text-[10px] font-black uppercase tracking-widest px-2">Added</span>
+                    ) : (
+                      <ShoppingBag size={20} />
+                    )}
+                  </button>
+                  <button 
+                    onClick={() => handleBuyNow(product)}
+                    className="p-4 bg-brand-green text-white rounded-xl transition-all shadow-xl hover:bg-brand-gold hover:text-brand-green active:scale-95 flex items-center justify-center"
+                    title="Buy Now"
+                  >
+                    <CreditCard size={20} />
+                  </button>
+                </div>
               </div>
             </motion.div>
           ))}

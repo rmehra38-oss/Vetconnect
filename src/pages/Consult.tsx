@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { 
   MessageSquare, Phone, Video, AlertCircle, Sparkles, 
   ChevronRight, CheckCircle2, Dog, Cat, Bird, 
-  ShoppingBag, Calendar, ArrowLeft, CreditCard, Plus
+  ShoppingBag, Calendar, ArrowLeft, CreditCard, Plus, ShieldCheck
 } from 'lucide-react';
 import { getSymptomAnalysis } from '../services/geminiService';
 import { auth, db } from '../lib/firebase';
@@ -12,6 +12,8 @@ import { collection, query, where, getDocs, addDoc, serverTimestamp } from 'fire
 import { WHATSAPP_LINK } from '../constants';
 import Markdown from 'react-markdown';
 import { handleFirestoreError, OperationType } from '../lib/firestore-errors';
+import { openRazorpay } from '../lib/razorpay';
+import { sendNotification, scheduleReminder } from '../services/notificationService';
 
 const SERVICES = [
   { id: 'whatsapp', icon: MessageSquare, title: "WhatsApp Chat", price: "₹99", color: "bg-green-50 text-green-600", desc: "Text, photo & video messages via WhatsApp Business API" },
@@ -33,6 +35,7 @@ export default function Consult() {
   const [selectedPet, setSelectedPet] = useState<any>(null);
   const [customPet, setCustomPet] = useState(searchParams.get('pet') || '');
   const [selectedService, setSelectedService] = useState<string | null>(searchParams.get('service') || null);
+  const [selectedVetId, setSelectedVetId] = useState<string | null>(searchParams.get('vetId') || null);
   const [symptoms, setSymptoms] = useState('');
   const [analysis, setAnalysis] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -122,11 +125,41 @@ export default function Consult() {
   const petDisplayName = selectedPet ? selectedPet.name : (customPet || 'General Patient');
 
   const handlePayment = async () => {
+    if (!selectedService || !currentService) return;
+    
     setIsBooking(true);
-    // Simulate payment gateway
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    setIsBooking(false);
-    setIsSuccess(true);
+    
+    const amountInPaise = parseInt(currentService.price.replace('₹', '')) * 100;
+
+    openRazorpay({
+      amount: amountInPaise,
+      name: 'Vet Connect',
+      description: `${currentService.title} for ${petDisplayName}`,
+      prefill: {
+        name: auth.currentUser?.displayName || '',
+        email: auth.currentUser?.email || '',
+      },
+      handler: (response: any) => {
+        console.log('Payment Success:', response);
+        sendNotification(
+          "Appointment Confirmed! 🐾",
+          `Your ${currentService.title} for ${petDisplayName} is scheduled. A vet will join shortly.`
+        );
+        // Schedule a reminder for 5 minutes later
+        scheduleReminder(
+          "Consultation Reminder",
+          "Your session is about to start. Please stay in the Vet Connect dashboard.",
+          300000 
+        );
+        setIsBooking(false);
+        setIsSuccess(true);
+      },
+      modal: {
+        ondismiss: () => {
+          setIsBooking(false);
+        }
+      }
+    });
   };
 
   if (isSuccess) {
@@ -232,7 +265,17 @@ export default function Consult() {
             >
               <div className="text-center mb-12">
                 <h1 className="text-5xl font-serif italic text-brand-green mb-4">Select Patient</h1>
-                <p className="text-brand-green/50 text-[10px] font-black uppercase tracking-[0.3em]">Choose a registered specimen or enter details</p>
+                <p className="text-brand-green/50 text-[10px] font-black uppercase tracking-[0.3em] mb-4">Choose a registered specimen or enter details</p>
+                {selectedVetId && (
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="inline-flex items-center gap-2 bg-brand-gold/10 text-brand-gold px-4 py-2 rounded-full border border-brand-gold/20"
+                  >
+                    <ShieldCheck size={12} />
+                    <span className="text-[10px] font-black uppercase tracking-[0.3em]">Direct Booking with Specialist</span>
+                  </motion.div>
+                )}
               </div>
 
               {loadingPets ? (
@@ -279,11 +322,11 @@ export default function Consult() {
 
               <div className="flex justify-center">
                 <button 
-                  onClick={() => setStep(2)}
+                  onClick={() => setStep(selectedService ? 4 : 2)}
                   disabled={!selectedPet}
                   className="px-12 py-5 bg-brand-green text-white font-black uppercase tracking-[0.3em] text-[10px] rounded-full hover:bg-brand-gold hover:text-brand-green transition-all shadow-xl disabled:opacity-50 flex items-center gap-4"
                 >
-                  Continue to Symptoms <ChevronRight size={16} />
+                  {selectedService ? 'Review & Pay' : 'Continue to Symptoms'} <ChevronRight size={16} />
                 </button>
               </div>
 
